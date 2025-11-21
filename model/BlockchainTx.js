@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const blockchainTxSchema = new mongoose.Schema({
     orderId: mongoose.Schema.Types.ObjectId,
-    userId: mongoose.Schema.Types.ObjectId,
     txHash: String,
     fromAddress: String,
     toAddress: String,

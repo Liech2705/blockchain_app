@@ -1,5 +1,6 @@
 var User = require("../model/User");
 const Order = require("../model/Order");
+const BlockchainTx = require("../model/BlockchainTx");
 var Event = null;
 const { ethers } = require('ethers');
 require('dotenv').config(); // Để đọc .env
@@ -159,13 +160,13 @@ module.exports = function (app) {
 
             // 3. TẠO HASH (Băm dữ liệu) - Khớp 100% với Solidity
             const messageHash = ethers.solidityPackedKeccak256(
-                ["uint256", "uint256", "address"],
+                ["string", "uint256", "address"],
                 [
                     // Chuyển OrderID (String MongoDB) sang số (hoặc Hash) để Solidity hiểu
                     // Mẹo: Để đơn giản cho người mới, ta dùng BigInt của 1 con số hash từ string ID
                     // Hoặc nếu bạn dùng OrderId là số tự tăng thì điền số vào.
                     // Ở đây tui hash cái ID mongodb thành số để vừa lòng Solidity uint256
-                    ethers.toBigInt(ethers.id(orderId.toString())),
+                    orderId.toString(),
                     priceWei,
                     userAddress
                 ]
@@ -178,7 +179,7 @@ module.exports = function (app) {
             // 5. Trả về
             res.json({
                 // Trả về đúng cái ID dạng số đã hash để Frontend gửi lên Contract
-                orderId: ethers.id(orderId.toString()),
+                orderId: orderId.toString(),
                 price: priceWei.toString(),
                 signature: signature
             });
@@ -194,13 +195,24 @@ module.exports = function (app) {
     // =========================================================
     app.post('/update-order-success', async (req, res) => {
         try {
-            const { orderId, txHash } = req.body;
+            const { orderId, txHash, fromAddress, toAddress, network, status, amount } = req.body;
             // Cập nhật DB
             await Order.findByIdAndUpdate(orderId, {
                 status: "completed",
-                transactionHash: txHash,
                 updatedAt: new Date()
             });
+
+            const txRecord = new BlockchainTx({
+                orderId,
+                txHash,
+                fromAddress,
+                toAddress,
+                network,
+                amount,
+                status,
+                createdAt: new Date()
+            });
+            await txRecord.save();
             res.json({ success: true });
         } catch (e) {
             res.json({ success: false });

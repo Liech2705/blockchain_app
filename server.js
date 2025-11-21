@@ -1,8 +1,6 @@
-require('dotenv').config();
 var express = require("express");
 var app = express();
 const session = require('express-session');
-const { ethers } = require('ethers');
 const cors = require('cors');
 
 app.use(session({

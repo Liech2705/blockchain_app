@@ -395,7 +395,7 @@
 
   <script>
     // --- CẤU HÌNH ---
-    const CONTRACT_ADDRESS = "0x7B895e161953522EB8f0bA423EC96ACda1c31178";
+    const CONTRACT_ADDRESS = "0x569c9B6864703b967382Af6c6014dE003A4ea437";
     // ABI rút gọn (chỉ giữ hàm cần dùng cho nhẹ code)
     const CONTRACT_ABI = [
       {
@@ -482,9 +482,9 @@
         "inputs": [
           {
             "indexed": false,
-            "internalType": "uint256",
+            "internalType": "string",
             "name": "_OrderId",
-            "type": "uint256"
+            "type": "string"
           },
           {
             "indexed": false,
@@ -511,9 +511,9 @@
       {
         "inputs": [
           {
-            "internalType": "uint256",
+            "internalType": "string",
             "name": "_OrderId",
-            "type": "uint256"
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -542,14 +542,39 @@
         "name": "customers",
         "outputs": [
           {
-            "internalType": "uint256",
+            "internalType": "string",
             "name": "_OrderId",
-            "type": "uint256"
+            "type": "string"
           },
           {
             "internalType": "address",
             "name": "_Vi",
             "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllCustomers",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "_OrderId",
+                "type": "string"
+              },
+              {
+                "internalType": "address",
+                "name": "_Vi",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct BuyTicket.Customer[]",
+            "name": "",
+            "type": "tuple[]"
           }
         ],
         "stateMutability": "view",
@@ -607,7 +632,36 @@
     let type = 'Normal';
     let multiplier = 1;
     let qty = 1;
+    // const RPC_URL = "https://evmtestnet.confluxrpc.com";
+    // const provider = new ethers.JsonRpcProvider(RPC_URL);
 
+    // async function loadAllData() {
+    //   const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+    //   try {
+    //     // Gọi 1 lần lấy hết sạch dữ liệu
+    //     const allData = await contract.getAllCustomers();
+
+    //     console.log("Tổng số đơn:", allData.length);
+
+    //     // Duyệt mảng để hiển thị
+    //     // Lưu ý: Dữ liệu trả về dạng Array của các Array/Struct
+    //     allData.forEach((customer, index) => {
+    //       // customer[0] là OrderId
+    //       // customer[1] là Ví Address
+    //       // Hoặc có thể gọi customer._OrderId nếu Ethers version mới hỗ trợ
+    //       console.log(`Đơn hàng số ${index}: ID=${customer[0]}, Ví=${customer[1]}`);
+
+    //       // Render ra HTML ở đây...
+    //       // $('#list').append(`<li>${customer[1]} mua vé ${customer[0]}</li>`);
+    //     });
+
+    //   } catch (err) {
+    //     console.error("Lỗi:", err);
+    //   }
+    // }
+
+    // loadAllData();
     // --- HÀM XỬ LÝ GIAO DIỆN ---
     function updateTotal() {
       const total = price * multiplier * qty;
@@ -728,6 +782,7 @@
       }).done(async (res) => {
         if (res.success) {
           // Có OrderID rồi thì mới gọi Smart Contract
+          console.log('Đơn hàng tạo thành công, OrderID:', res.orderId);
           await buyTicket(res.orderId, btn);
         } else {
           alert('Lỗi tạo đơn hàng: ' + res.message);
@@ -757,62 +812,62 @@
           body: JSON.stringify({ orderId: orderId, userAddress: currentAccount })
         });
 
-                const data = await response.json();
-                if (!data.signature) throw new Error("Server không cấp chữ ký!");
-        
-                // B. Gọi Smart Contract và KIỂM TRA SỐ DƯ (Bản nâng cấp)
-                statusDiv.innerText = "Đang kiểm tra số dư và ước tính phí...";
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const priceInWei = ethers.toBigInt(data.price);
-        
-                try {
-                    // Ước tính gas cần cho giao dịch
-                    const estimatedGas = await contract.buyTicket.estimateGas(
-                        data.orderId,
-                        priceInWei,
-                        data.signature,
-                        { value: priceInWei }
-                    );
-        
-                    // Lấy giá gas hiện tại
-                    const feeData = await provider.getFeeData();
-                    const gasPrice = feeData.gasPrice;
-                    
-                    // Tính tổng phí gas ước tính
-                    const estimatedGasFee = estimatedGas * gasPrice;
-                    const totalRequired = priceInWei + estimatedGasFee;
-                    const balance = await provider.getBalance(signer.getAddress());
-        
-                    if (balance < totalRequired) {
-                        const format = (val) => ethers.formatEther(val).slice(0, 10);
-                        const msg = `Số dư không đủ.
+        const data = await response.json();
+        if (!data.signature) throw new Error("Server không cấp chữ ký!");
+
+        // B. Gọi Smart Contract và KIỂM TRA SỐ DƯ (Bản nâng cấp)
+        statusDiv.innerText = "Đang kiểm tra số dư và ước tính phí...";
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        const priceInWei = ethers.toBigInt(data.price);
+
+        try {
+          // Ước tính gas cần cho giao dịch
+          const estimatedGas = await contract.buyTicket.estimateGas(
+            data.orderId,
+            priceInWei,
+            data.signature,
+            { value: priceInWei }
+          );
+
+          // Lấy giá gas hiện tại
+          const feeData = await provider.getFeeData();
+          const gasPrice = feeData.gasPrice;
+
+          // Tính tổng phí gas ước tính
+          const estimatedGasFee = estimatedGas * gasPrice;
+          const totalRequired = priceInWei + estimatedGasFee;
+          const balance = await provider.getBalance(signer.getAddress());
+
+          if (balance < totalRequired) {
+            const format = (val) => ethers.formatEther(val).slice(0, 10);
+            const msg = `Số dư không đủ.
                         - Số dư của bạn: ${format(balance)} CFX/ETH
                         - Tổng yêu cầu: ~${format(totalRequired)} CFX/ETH
                         (Bao gồm ${format(priceInWei)} cho vé và ~${format(estimatedGasFee)} cho phí giao dịch)
                         `;
-                        alert(msg);
-                        btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
-                        statusDiv.innerText = "Lỗi: Số dư không đủ.";
-                        return;
-                    }
-        
-                } catch (gasError) {
-                     // Bắt cả lỗi nếu việc ước tính gas thất bại (thường do logic hợp đồng)
-                    console.error("Lỗi khi ước tính gas:", gasError);
-                    alert("Không thể ước tính phí giao dịch. Lỗi có thể từ logic smart contract. Chi tiết: " + (gasError.reason || gasError.message));
-                    btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
-                    return;
-                }
-                
-        
-                // Nếu đủ tiền, tiến hành giao dịch
-                statusDiv.innerText = "Đang mở MetaMask...";
-                const tx = await contract.buyTicket(
-                  data.orderId,
-                  priceInWei,
-                  data.signature,
-                  { value: priceInWei } 
-                );
+            alert(msg);
+            btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+            statusDiv.innerText = "Lỗi: Số dư không đủ.";
+            return;
+          }
+
+        } catch (gasError) {
+          // Bắt cả lỗi nếu việc ước tính gas thất bại (thường do logic hợp đồng)
+          console.error("Lỗi khi ước tính gas:", gasError);
+          alert("Không thể ước tính phí giao dịch. Lỗi có thể từ logic smart contract. Chi tiết: " + (gasError.reason || gasError.message));
+          btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+          return;
+        }
+
+
+        // Nếu đủ tiền, tiến hành giao dịch
+        statusDiv.innerText = "Đang mở MetaMask...";
+        const tx = await contract.buyTicket(
+          data.orderId,
+          priceInWei,
+          data.signature,
+          { value: priceInWei }
+        );
         statusDiv.innerText = "Đang chờ xác nhận trên Blockchain...";
         btnElement.text('Đang xử lý giao dịch...');
 
@@ -824,7 +879,16 @@
         alert("Giao dịch thành công! Hash: " + tx.hash);
 
         // Cập nhật lại trạng thái đơn hàng trên Database (Thành Success)
-        $.post('/update-order-success', { orderId: orderId, txHash: tx.hash });
+        $.post('/update-order-success', { orderId: orderId, txHash: tx.hash, fromAddress: currentAccount, toAddress: CONTRACT_ADDRESS, network: "conflux testnet", status: "Success", amount: Number(ethers.formatEther(priceInWei)) })
+          .done((res) => {
+            if (res.success) {
+              console.log('Cập nhật đơn hàng thành công trên Database.');
+            } else {
+              console.warn('Lỗi cập nhật đơn hàng trên Database:', res.message);
+            }
+          }).fail((err) => {
+            console.error('Lỗi kết nối Server khi cập nhật đơn hàng:', err);
+          });
 
         // Chuyển hướng
         window.location.href = '/my-tickets';
