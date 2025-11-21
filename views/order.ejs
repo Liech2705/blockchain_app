@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= event.title %>
+  </title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Giữ nguyên toàn bộ CSS cũ của bạn */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #121212;
+      color: #fff;
+      padding: 20px 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .payment-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .user-section {
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      color: #00d4aa;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #2a2a2a;
+    }
+
+    .user-info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .event-section {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-poster {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stage-light {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 212, 170, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+    }
+
+    .letter-A {
+      position: absolute;
+      font-size: 200px;
+      font-weight: bold;
+      color: rgba(0, 212, 170, 0.15);
+      pointer-events: none;
+    }
+
+    .event-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-details {
+      padding: 32px;
+      background: #1a1a1a;
+      color: white;
+    }
+
+    .event-title {
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      color: #00d4aa;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .meta-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      stroke: #00d4aa;
+      fill: none;
+    }
+
+    .ticket-selection {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      border: 1px solid rgba(0, 212, 170, 0.2);
+    }
+
+    .ticket-type {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .ticket-type:hover {
+      background: rgba(0, 212, 170, 0.15);
+    }
+
+    .ticket-type.selected {
+      background: rgba(0, 212, 170, 0.25);
+      border: 2px solid #00d4aa;
+    }
+
+    .type-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .type-price {
+      color: #00d4aa;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 20px 0;
+      font-size: 1.5rem;
+    }
+
+    .quantity-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #333;
+      color: white;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .quantity-btn:hover {
+      background: #00d4aa;
+    }
+
+    .total-price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00d4aa;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 212, 170, 0.1);
+      border-radius: 12px;
+      margin: 24px 0;
+    }
+
+    .register-btn {
+      width: 100%;
+      background: linear-gradient(45deg, #00d4aa, #00b894);
+      color: white;
+      padding: 18px 0;
+      font-size: 1.3rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+    }
+
+    .register-btn:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+
+    .wallet-status {
+      text-align: center;
+      margin: 16px 0;
+      font-size: 1rem;
+      color: #aaa;
+    }
+
+    @media (max-width: 968px) {
+      .payment-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="payment-layout">
+      <!-- Bên trái: Thông tin người dùng (giữ nguyên) -->
+      <div class="user-section">
+        <h2 class="section-title">Thông tin người đăng ký</h2>
+        <div class="user-info-grid">
+          <div class="info-item"><span class="info-label">Họ và tên</span><span class="info-value">
+              <%= user.HoTen %>
+            </span></div>
+          <div class="info-item"><span class="info-label">Email</span><span class="info-value">
+              <%= user.Email %>
+            </span></div>
+          <div class="info-item"><span class="info-label">Số điện thoại</span><span class="info-value">
+              <%= user.SoDT %>
+            </span></div>
+        </div>
+      </div>
+
+      <!-- Bên phải: Sự kiện + Chọn vé -->
+      <div class="event-section">
+        <div class="event-poster">
+          <div class="stage-light"></div>
+          <div class="letter-A">A</div>
+          <img src="<%= event.thumbnail || '/images/default-event.jpg' %>" alt="<%= event.title %>">
+        </div>
+
+        <div class="event-details">
+          <h1 class="event-title">
+            <%= event.title %>
+          </h1>
+
+          <div class="event-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <div><strong>Thời gian:</strong><br>
+                <%= event.startDate ? new Date(event.startDate).toLocaleDateString('vi-VN',
+                  {weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})
+                  : 'Chưa xác định' %>
+              </div>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <div><strong>Địa điểm:</strong><br>
+                <%= event.location || 'Chưa xác định' %>
+              </div>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 017 12V7z" />
+              </svg>
+              <div><strong>Thể loại:</strong><br>
+                <%= event.category || 'Chưa phân loại' %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chọn vé -->
+          <div class="ticket-selection">
+            <h3 style="color:#00d4aa; margin-bottom:16px;">Chọn loại vé</h3>
+
+            <div class="ticket-type selected" data-type="Normal" data-price="<%= event.price || 0 %>">
+              <div>
+                <div class="type-name">Normal (Thường)</div><small>Ghế khu tự do</small>
+              </div>
+              <div class="type-price">
+                <%= (event.price || 0).toLocaleString('vi-VN') %> đ
+              </div>
+            </div>
+
+            <div class="ticket-type" data-type="VIP" data-price="<%= (event.price || 0) * 3 %>">
+              <div>
+                <div class="type-name">VIP</div><small>Ghế gần sân khấu + quà tặng</small>
+              </div>
+              <div class="type-price">
+                <%= ((event.price || 0) * 3).toLocaleString('vi-VN') %> đ
+              </div>
+            </div>
+
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn" id="decrease">-</button>
+              <span id="quantity">1</span>
+              <button type="button" class="quantity-btn" id="increase">+</button>
+            </div>
+
+            <div class="total-price">
+              Tổng tiền: <span id="totalAmount">
+                <%= event.price || 0 %>
+              </span> đ
+            </div>
+          </div>
+
+          <!-- Trạng thái ví -->
+          <div class="wallet-status" id="walletStatus">Chưa kết nối ví Metamask</div>
+          <!-- NÚT CONNECT METAMASK NHỎ XINH -->
+          <button id="connectWalletBtn" style="
+              margin-top: 12px;
+              padding: 10px 20px;
+              background: transparent;
+              border: 2px solid #00d4aa;
+              color: #00d4aa;
+              border-radius: 30px;
+              font-weight: 600;
+              font-size: 0.95rem;
+              cursor: pointer;
+              transition: all 0.3s;
+            ">
+            Kết nối ví Metamask
+          </button>
+        </div>
+        <button class="register-btn" id="confirmPayment">
+          Thanh toán ví Metamask
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+  <script>
+    let web3;
+    let currentAccount = "";
+    let price = Number("<%= event.price || 0 %>");
+    let type = 'Normal';
+    let multiplier = 1;
+    let qty = 1;
+
+    // Cập nhật tổng tiền
+    function updateTotal() {
+      const total = price * multiplier * qty;
+      $('#totalAmount').text(total.toLocaleString('vi-VN'));
+    }
+
+    // Chọn loại vé
+    $('.ticket-type').click(function () {
+      $('.ticket-type').removeClass('selected');
+      $(this).addClass('selected');
+      type = $(this).data('type');
+      multiplier = type === 'VIP' ? 3 : 1;
+      updateTotal();
+    });
+
+    $('#increase').click(() => { qty = Math.min(qty + 1, 20); $('#quantity').text(qty); updateTotal(); });
+    $('#decrease').click(() => { if (qty > 1) qty--; $('#quantity').text(qty); updateTotal(); });
+
+    // Hàm kết nối ví
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('Vui lòng cài đặt MetaMask để tiếp tục!');
+        return false;
+      }
+
+      try {
+        web3 = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        currentAccount = accounts[0];
+
+        $('#walletStatus').html(`Đã kết nối: <strong style="color:#00d4aa;">${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}</strong>`);
+        $('#connectWalletBtn')
+          .text('Đã kết nối')
+          .prop('disabled', true)
+          .css({ background: '#00d4aa', color: 'white', border: 'none' });
+
+        $('#confirmPayment')
+          .prop('disabled', false)
+          .text('Thanh toán ví Metamask');
+
+        return true;
+      } catch (err) {
+        alert('Bạn đã từ chối kết nối ví');
+        return false;
+      }
+    }
+
+    // Tự động kết nối khi load trang (nếu đã từng kết nối)
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          currentAccount = accounts[0];
+          $('#walletStatus').html(`Đã kết nối: <strong style="color:#00d4aa;">${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}</strong>`);
+          $('#connectWalletBtn')
+            .text('Đã kết nối')
+            .prop('disabled', true)
+            .css({ background: '#00d4aa', color: 'white', border: 'none' });
+          $('#confirmPayment').prop('disabled', false);
+        }
+      }
+      updateTotal();
+    });
+
+    // Click nút kết nối
+    $('#connectWalletBtn').click(connectWallet);
+
+    // Thanh toán
+    $('#confirmPayment').click(async function () {
+      if (!currentAccount) {
+        alert('Vui lòng kết nối ví trước!');
+        return;
+      }
+
+      const totalVND = price * multiplier * qty;
+      const ethPrice = 23000000; // 1 ETH ≈ 23 triệu VND (có thể lấy realtime sau)
+      const ethAmount = totalVND / ethPrice;
+      const weiValue = web3.utils.toWei(ethAmount.toFixed(18), 'ether');
+
+      const recipientAddress = "0xb5a4d78960e22eedc456102b457b26666785f142"; // Ví nhận tiền của bạn
+
+      try {
+        $(this).text('Đang chờ xác nhận giao dịch...').prop('disabled', true);
+
+        const txHash = await ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: currentAccount,
+            to: recipientAddress,
+            value: '0x' + BigInt(weiValue).toString(16),
+          }],
+        });
+
+        // Lưu đơn hàng
+        $.post('/create-order', {
+          eventId: '<%= event._id %>',
+          userId: '<%= user._id %>',
+          ticketType: type,
+          quantity: qty,
+          totalAmount: totalVND,
+          txHash: txHash
+        }).done(res => {
+          if (res.success) {
+            alert(`Thanh toán thành công!\nMã giao dịch:\n${txHash}`);
+            window.location.href = '/my-tickets';
+          }
+        });
+
+      } catch (err) {
+        console.error(err);
+        alert('Giao dịch bị hủy hoặc lỗi: ' + (err.message || ''));
+        $(this).text('Thanh toán ví Metamask').prop('disabled', false);
+      }
+    });
+  </script>
+</body>
+
+</html>

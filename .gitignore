@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment variables (RẤT QUAN TRỌNG: Chứa Private Key, API Key)
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Hardhat / Smart Contract artifacts (Nên chặn để giảm dung lượng)
+artifacts/
+cache/
+typechain-types/

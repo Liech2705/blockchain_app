@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: #fff;
+            padding: 20px
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto
+        }
+
+        .top {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px
+        }
+
+        .title {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .title h1 {
+            font-size: 1.6rem
+        }
+
+        .actions a {
+            background: #00b894;
+            color: #001;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px
+        }
+
+        .card {
+            background: #0e0e0e;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6)
+        }
+
+        .card .label {
+            color: #bbb;
+            font-size: 0.9rem
+        }
+
+        .card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 8px
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 16px
+        }
+
+        .panel {
+            background: #0e0e0e;
+            padding: 14px;
+            border-radius: 12px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem
+        }
+
+        th,
+        td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04)
+        }
+
+        th {
+            color: #bbb;
+            font-weight: 700;
+            font-size: 0.85rem
+        }
+
+        .muted {
+            color: #bbb;
+            font-size: 0.9rem
+        }
+
+        .small {
+            font-size: 0.85rem
+        }
+
+        .status-paid {
+            color: #00e676;
+            font-weight: 700
+        }
+
+        .status-pending {
+            color: #ffd54f;
+            font-weight: 700
+        }
+
+        .status-cancel {
+            color: #ff6b6b;
+            font-weight: 700
+        }
+
+        @media (max-width:980px) {
+            .grid-2 {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <div class="title">
+                <h1>Admin Dashboard</h1>
+                <div class="muted small">Quản lý bán vé &amp; đơn hàng</div>
+            </div>
+            <div class="actions">
+                <a href="/admin/events/new">Tạo sự kiện mới</a>
+            </div>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="label">Tổng sự kiện</div>
+                <div class="value">
+                    <%= (totals && typeof totals.events !=='undefined' ) ? totals.events : 0 %>
+                </div>
+            </div>
+            <div class="card">
+                <div class="label">Vé đã bán</div>
+                <div class="value">
+                    <%= (totals && typeof totals.ticketsSold !=='undefined' ) ? totals.ticketsSold : 0 %>
+                </div>
+            </div>
+            <div class="card">
+                <div class="label">Tổng doanh thu</div>
+                <div class="value">
+                    <%= (totals && typeof totals.revenue !=='undefined' ) ? totals.revenue.toLocaleString('vi-VN')
+                        + ' đ' : '0 đ' %>
+                </div>
+            </div>
+            <div class="card">
+                <div class="label">Người dùng</div>
+                <div class="value">
+                    <%= (typeof usersCount !=='undefined' ) ? usersCount : 0 %>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <div class="panel">
+                    <h2 style="margin:0 0 12px; font-size:1.05rem">Đơn hàng mới nhất</h2>
+                    <% if (recentOrders && recentOrders.length) { %>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Người mua</th>
+                                    <th>Sự kiện</th>
+                                    <th>Số lượng</th>
+                                    <th>Tổng</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% recentOrders.forEach(function(o, idx) { %>
+                                    <tr>
+                                        <td>
+                                            <%= idx + 1 %>
+                                        </td>
+                                        <td>
+                                            <%= (o.user && (o.user.name || o.user.email)) ? (o.user.name ||
+                                                o.user.email) : (o.user || 'Khách' ) %>
+                                        </td>
+                                        <td><a href="/detail?id=<%= o.eventId || '' %>"
+                                                style="color:inherit; text-decoration:none;">
+                                                <%= o.eventTitle || '—' %>
+                                            </a></td>
+                                        <td>
+                                            <%= o.qty || o.quantity || 0 %>
+                                        </td>
+                                        <td>
+                                            <%= (o.total || 0).toLocaleString('vi-VN') %> đ
+                                        </td>
+                                        <td>
+                                            <% if (o.status==='paid' ) { %>
+                                                <span class="status-paid">Đã thanh toán</span>
+                                                <% } else if (o.status==='pending' ) { %>
+                                                    <span class="status-pending">Chờ xử lý</span>
+                                                    <% } else { %>
+                                                        <span class="status-cancel">Hủy/Khác</span>
+                                                        <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                            <p class="muted">Không có đơn hàng gần đây.</p>
+                            <% } %>
+                </div>
+
+                <div class="panel" style="margin-top:16px">
+                    <h2 style="margin:0 0 12px; font-size:1.05rem">Sự kiện sắp tới</h2>
+                    <% if (events && events.length) { %>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Ngày</th>
+                                    <th>Vé còn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% events.forEach(function(ev, i) { %>
+                                    <tr>
+                                        <td>
+                                            <%= i + 1 %>
+                                        </td>
+                                        <td><a href="/detail?id=<%= ev._id %>"
+                                                style="color:inherit;text-decoration:none">
+                                                <%= ev.title %>
+                                            </a></td>
+                                        <td class="small muted">
+                                            <%= ev.date ? (new Date(ev.date)).toLocaleString('vi-VN') : '—' %>
+                                        </td>
+                                        <td>
+                                            <%= (typeof ev.ticketsLeft !=='undefined' ) ? ev.ticketsLeft : (ev.available
+                                                || '—' ) %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                            <p class="muted">Không có sự kiện.</p>
+                            <% } %>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel">
+                    <h2 style="margin:0 0 12px; font-size:1.05rem">Tác vụ nhanh</h2>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                        <a class="small" href="/admin/events">Quản lý sự kiện</a>
+                        <a class="small" href="/admin/orders">Quản lý đơn hàng</a>
+                        <a class="small" href="/admin/users">Quản lý người dùng</a>
+                        <a class="small" href="/admin/checkins">Quản lý check-in</a>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:16px">
+                    <h2 style="margin:0 0 12px; font-size:1.05rem">Thông tin nhanh</h2>
+                    <div class="muted small">
+                        <p><strong>Version:</strong> 1.0</p>
+                        <p><strong>Time:</strong>
+                            <%= new Date().toLocaleString('vi-VN') %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

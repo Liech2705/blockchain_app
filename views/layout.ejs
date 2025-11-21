@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sự Kiện Nổi Bật</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .fire {
+      font-size: 1.5rem;
+    }
+
+    /* Sự kiện đặc biệt */
+    .special-events {
+      margin-bottom: 60px;
+    }
+
+    .event-carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .event-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .event-card {
+      min-width: 280px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .event-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Sự kiện xu hướng */
+    .trending-events {
+      margin-bottom: 40px;
+    }
+
+    .trending-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .trending-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      height: 180px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .trending-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-title {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 36px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.95rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(135deg, #00c853, #64dd17);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.4rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .event-card {
+        min-width: 240px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+   <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="/process.js"></script> 
+    <script src="/scripts/web3.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">Trang chủ</a>
+      <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto">
+              <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+                  <li class="nav-item"><a class="nav-link" href="/admin/users">Quản lý tài khoản</a></li>
+                  <li class="nav-item"><a class="nav-link" href="/admin/events">Quản lý sự kiện</a></li>
+                  <li class="nav-item"><a class="nav-link" href="/logout">Đăng xuất</a></li>
+              <% } else { %>
+                  <li class="nav-item"><a class="nav-link" href="/login">Đăng nhập</a></li>
+              <% } %>
+          </ul>
+      </div>
+  </nav>
+  <div class="container">
+    <!-- Danh mục sự kiện -->
+    <section class="categories" style="margin-bottom:20px;">
+      <h2>Danh mục</h2>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;">
+        <% if (categories && categories.length) { %>
+          <% categories.forEach(function(cat) { %>
+            <a href="/category/<%= encodeURIComponent(cat) %>" style="background:#222;padding:8px 12px;border-radius:8px;color:#fff;"> <%= cat %> </a>
+          <% }); %>
+        <% } else { %>
+          <span style="color:#bbb">Không có danh mục</span>
+        <% } %>
+      </div>
+    </section>
+    <!-- Sự kiện xu hướng -->
+    <section class="trending-events">
+      <h2><span class="fire">🔥</span> Sự kiện xu hướng</h2>
+      <div class="trending-grid">
+        <% if (trendingEvents && trendingEvents.length) { %>
+          <% trendingEvents.forEach(function(event) { %>
+            <a href="/detail?id=<%= event._id %>" style="text-decoration:none;color:inherit;">
+              <div class="trending-card">
+                <img src="<%= event.thumbnail %>" alt="<%= event.title %>">
+                <div class="card-title"><%= event.title %></div>
+                <div class="rank"><%= event.rank || 1 %></div>
+                <div style="position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,0.6);padding:6px 8px;border-radius:6px;font-weight:600;">
+                  <%= (event.price || 0).toLocaleString('vi-VN') %> đ
+                </div>
+              </div>
+            </a>
+          <% }); %>
+        <% } else { %>
+          <p style="color:#bbb;">Không có sự kiện xu hướng</p>
+        <% } %>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>

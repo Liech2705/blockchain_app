@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Thành Viên</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- jQuery & Web3 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .metamask-connect {
+            width: 100%;
+            padding: 14px;
+            background: #f8f9fa;
+            border: 2px dashed #adb5bd;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .metamask-connect:hover {
+            border-color: #764ba2;
+            background: #f0e6ff;
+            color: #764ba2;
+        }
+
+        .metamask-connect.connected {
+            background: #e6f7ee;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .metamask-connect i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Đăng Ký Nhận Vé</h1>
+        </div>
+
+        <div class="form-container">
+        <form id="frmDangKy">
+                <div class="form-group">
+                    <label for="txtHoTen">Họ và tên</label>
+                    <input type="text" id="txtHoTen" placeholder="Nhập họ và tên của bạn" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="txtEmail">Email</label>
+                    <input type="email" id="txtEmail" placeholder="example@gmail.com" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="txtSoDT">Số điện thoại</label>
+                    <input type="tel" id="txtSoDT" placeholder="0901234567" required />
+                </div>
+
+                <button type="button" class="btn-submit" id="btnDangKy">
+    Đi đến thanh toán
+</button>
+            </form>
+
+            <div class="footer-text">
+                Thông tin của bạn được bảo mật tuyệt đối
+            </div>
+        </div>
+    </div>
+<% if (eventId) { %>
+  <input type="hidden" id="eventId" value="<%= eventId %>">
+<% } %>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#btnDangKy').on('click', function() {
+        const HoTen = $('#txtHoTen').val().trim();
+        const Email = $('#txtEmail').val().trim();
+        const SoDT = $('#txtSoDT').val().trim();
+        const eventId = $('#eventId').val() || '';
+
+        if (!HoTen || !Email || !SoDT) {
+            alert('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+
+        $.post('/dangky', {
+            HoTen: HoTen,
+            Email: Email,
+            SoDT: SoDT,
+            eventId: eventId
+        })
+        .done(function(data) {
+            console.log(data);
+            if (data.ketqua === 1) {
+                if (eventId) {
+                    window.location.href = `/order?eventId=${eventId}&email=${encodeURIComponent(Email)}`;
+                } else {
+                    alert('Đăng ký thành công!');
+                }
+            } else {
+                alert(data.maloi || 'Đăng ký thất bại');
+            }
+        })
+        .fail(function() {
+            alert('Lỗi kết nối server, vui lòng thử lại');
+        });
+    });
+});
+</script>
+
+</body>
+</html>
