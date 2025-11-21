@@ -1,7 +1,9 @@
-
+require('dotenv').config();
 var express = require("express");
 var app = express();
 const session = require('express-session');
+const { ethers } = require('ethers');
+const cors = require('cors');
 
 app.use(session({
     secret: 'your-secret-key',
@@ -12,6 +14,8 @@ app.use(session({
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
+app.use(cors());
+app.use(express.json());
 
 var server = require("http").Server(app);
 var io = require("socket.io")(server);

@@ -1,10 +1,16 @@
 var User = require("../model/User");
+const Order = require("../model/Order");
 var Event = null;
+const { ethers } = require('ethers');
+require('dotenv').config(); // Để đọc .env
 
 module.exports = function (app) {
 
     // lazy-require Event so models are available after mongoose connects
     try { Event = require('../model/Event'); } catch (e) { /* ignore */ }
+    const SERVER_PRIVATE_KEY = process.env.PRIVATE_KEY;
+    if (!SERVER_PRIVATE_KEY) console.error("❌ CHƯA CẤU HÌNH PRIVATE KEY TRONG .ENV");
+    const wallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
 
     app.get("/", function (req, res) {
         res.render("layout");
@@ -105,7 +111,7 @@ module.exports = function (app) {
     });
 
     // ==================== TẠO ĐƠN HÀNG (QUAN TRỌNG NHẤT) ====================
-    const Order = require("../model/Order");
+
     // TẠO ĐƠN HÀNG PENDING
     app.post('/create-pending-order', async (req, res) => {
         try {
@@ -127,6 +133,77 @@ module.exports = function (app) {
         } catch (err) {
             console.error(err);
             res.json({ success: false, message: err.message });
+        }
+    });
+
+    app.post('/api/get-signature', async (req, res) => {
+        try {
+            const { orderId, userAddress } = req.body;
+
+            // 1. Lấy đơn hàng từ DB để biết giá chuẩn
+            const order = await Order.findById(orderId);
+            if (!order) return res.status(404).json({ error: "Không tìm thấy đơn hàng" });
+
+            // 2. Tính toán giá trị ETH (Logic này nên nằm ở Server để bảo mật)
+            // Giả sử 1 ETH = 23,000,000 VND (Thực tế nên dùng API lấy giá live)
+            const FAKE_RATE = 100000000;
+            const amountInCFX = order.totalAmount / FAKE_RATE;
+
+            // Chuyển sang Wei (Đơn vị nhỏ nhất của Blockchain)
+            // toFixed(18) để tránh lỗi số học JS, nhưng ethers cần chuỗi string
+            const priceWei = ethers.parseEther(amountInCFX.toFixed(18));
+
+            console.log(`Server đang ký vé ${orderId}`);
+            console.log(`- Giá gốc: ${order.totalAmount} VND`);
+            console.log(`- Giá Test: ${amountInCFX} CFX`);
+
+            // 3. TẠO HASH (Băm dữ liệu) - Khớp 100% với Solidity
+            const messageHash = ethers.solidityPackedKeccak256(
+                ["uint256", "uint256", "address"],
+                [
+                    // Chuyển OrderID (String MongoDB) sang số (hoặc Hash) để Solidity hiểu
+                    // Mẹo: Để đơn giản cho người mới, ta dùng BigInt của 1 con số hash từ string ID
+                    // Hoặc nếu bạn dùng OrderId là số tự tăng thì điền số vào.
+                    // Ở đây tui hash cái ID mongodb thành số để vừa lòng Solidity uint256
+                    ethers.toBigInt(ethers.id(orderId.toString())),
+                    priceWei,
+                    userAddress
+                ]
+            );
+
+            // 4. KÝ TÊN
+            const messageBytes = ethers.getBytes(messageHash);
+            const signature = await wallet.signMessage(messageBytes);
+
+            // 5. Trả về
+            res.json({
+                // Trả về đúng cái ID dạng số đã hash để Frontend gửi lên Contract
+                orderId: ethers.id(orderId.toString()),
+                price: priceWei.toString(),
+                signature: signature
+            });
+
+        } catch (error) {
+            console.error("Lỗi ký tên:", error);
+            res.status(500).json({ error: "Lỗi Server: " + error.message });
+        }
+    });
+
+    // =========================================================
+    // API CẬP NHẬT TRẠNG THÁI THÀNH CÔNG
+    // =========================================================
+    app.post('/update-order-success', async (req, res) => {
+        try {
+            const { orderId, txHash } = req.body;
+            // Cập nhật DB
+            await Order.findByIdAndUpdate(orderId, {
+                status: "completed",
+                transactionHash: txHash,
+                updatedAt: new Date()
+            });
+            res.json({ success: true });
+        } catch (e) {
+            res.json({ success: false });
         }
     });
 }

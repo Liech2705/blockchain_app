@@ -391,22 +391,229 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 
   <script>
-    let web3;
+    // --- CẤU HÌNH ---
+    const CONTRACT_ADDRESS = "0x7B895e161953522EB8f0bA423EC96ACda1c31178";
+    // ABI rút gọn (chỉ giữ hàm cần dùng cho nhẹ code)
+    const CONTRACT_ABI = [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_signer",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "ECDSAInvalidSignature",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "length",
+            "type": "uint256"
+          }
+        ],
+        "name": "ECDSAInvalidSignatureLength",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "name": "ECDSAInvalidSignatureS",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "_OrderId",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "_Sent",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "_Received",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "_ChainId",
+            "type": "uint256"
+          }
+        ],
+        "name": "TicketPurchased",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "_OrderId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "_signature",
+            "type": "bytes"
+          }
+        ],
+        "name": "buyTicket",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "customers",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "_OrderId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "_Vi",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "signerAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ];
     let currentAccount = "";
     let price = Number("<%= event.price || 0 %>");
     let type = 'Normal';
     let multiplier = 1;
     let qty = 1;
 
-    // Cập nhật tổng tiền
+    // --- HÀM XỬ LÝ GIAO DIỆN ---
     function updateTotal() {
       const total = price * multiplier * qty;
       $('#totalAmount').text(total.toLocaleString('vi-VN'));
     }
 
-    // Chọn loại vé
     $('.ticket-type').click(function () {
       $('.ticket-type').removeClass('selected');
       $(this).addClass('selected');
@@ -418,103 +625,216 @@
     $('#increase').click(() => { qty = Math.min(qty + 1, 20); $('#quantity').text(qty); updateTotal(); });
     $('#decrease').click(() => { if (qty > 1) qty--; $('#quantity').text(qty); updateTotal(); });
 
-    // Hàm kết nối ví
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert('Vui lòng cài đặt MetaMask để tiếp tục!');
-        return false;
-      }
+    // --- HÀM CẬP NHẬT UI KHI TRẠNG THÁI VÍ THAY ĐỔI ---
+    function updateWalletUI(account) {
+      if (account) {
+        // Trạng thái: ĐÃ KẾT NỐI
+        currentAccount = account;
+        $('#walletStatus').html(`Đã kết nối: <strong style="color:#00d4aa;">${account.slice(0, 6)}...${account.slice(-4)}</strong>`);
 
-      try {
-        web3 = new Web3(window.ethereum);
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        currentAccount = accounts[0];
-
-        $('#walletStatus').html(`Đã kết nối: <strong style="color:#00d4aa;">${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}</strong>`);
+        // Đổi nút thành màu đỏ (Hủy kết nối)
         $('#connectWalletBtn')
-          .text('Đã kết nối')
-          .prop('disabled', true)
-          .css({ background: '#00d4aa', color: 'white', border: 'none' });
-
-        $('#confirmPayment')
+          .text('Hủy kết nối (Đổi ví)')
           .prop('disabled', false)
-          .text('Thanh toán ví Metamask');
+          .css({
+            background: 'transparent',
+            color: '#ff4757',
+            border: '2px solid #ff4757'
+          });
 
-        return true;
-      } catch (err) {
-        alert('Bạn đã từ chối kết nối ví');
-        return false;
+        $('#confirmPayment').prop('disabled', false).text('Thanh toán ví Metamask');
+      } else {
+        // Trạng thái: CHƯA KẾT NỐI / ĐÃ HỦY
+        currentAccount = "";
+        $('#walletStatus').text('Chưa kết nối ví Metamask');
+
+        // Đổi nút về màu xanh (Kết nối)
+        $('#connectWalletBtn')
+          .text('Kết nối ví Metamask')
+          .prop('disabled', false)
+          .css({
+            background: 'transparent',
+            color: '#00d4aa',
+            border: '2px solid #00d4aa'
+          });
+
+        $('#confirmPayment').prop('disabled', true).text('Vui lòng kết nối ví');
       }
     }
 
-    // Tự động kết nối khi load trang (nếu đã từng kết nối)
-    window.addEventListener('load', async () => {
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        const accounts = await ethereum.request({ method: 'eth_accounts' });
-        if (accounts.length > 0) {
-          currentAccount = accounts[0];
-          $('#walletStatus').html(`Đã kết nối: <strong style="color:#00d4aa;">${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}</strong>`);
-          $('#connectWalletBtn')
-            .text('Đã kết nối')
-            .prop('disabled', true)
-            .css({ background: '#00d4aa', color: 'white', border: 'none' });
-          $('#confirmPayment').prop('disabled', false);
-        }
-      }
-      updateTotal();
-    });
+    // --- HÀM KẾT NỐI / HỦY KẾT NỐI ---
+    async function handleWalletAction() {
+      if (!window.ethereum) return alert('Vui lòng cài đặt MetaMask!');
 
-    // Click nút kết nối
-    $('#connectWalletBtn').click(connectWallet);
-
-    // Thanh toán
-    $('#confirmPayment').click(async function () {
-      if (!currentAccount) {
-        alert('Vui lòng kết nối ví trước!');
+      // 1. Nếu đang kết nối -> Thực hiện HỦY KẾT NỐI
+      if (currentAccount) {
+        updateWalletUI(null); // Reset giao diện về null
         return;
       }
 
-      const totalVND = price * multiplier * qty;
-      const ethPrice = 23000000; // 1 ETH ≈ 23 triệu VND (có thể lấy realtime sau)
-      const ethAmount = totalVND / ethPrice;
-      const weiValue = web3.utils.toWei(ethAmount.toFixed(18), 'ether');
-
-      const recipientAddress = "0xb5a4d78960e22eedc456102b457b26666785f142"; // Ví nhận tiền của bạn
-
+      // 2. Nếu chưa kết nối -> Thực hiện KẾT NỐI
       try {
-        $(this).text('Đang chờ xác nhận giao dịch...').prop('disabled', true);
-
-        const txHash = await ethereum.request({
-          method: 'eth_sendTransaction',
-          params: [{
-            from: currentAccount,
-            to: recipientAddress,
-            value: '0x' + BigInt(weiValue).toString(16),
-          }],
-        });
-
-        // Lưu đơn hàng
-        $.post('/create-order', {
-          eventId: '<%= event._id %>',
-          userId: '<%= user._id %>',
-          ticketType: type,
-          quantity: qty,
-          totalAmount: totalVND,
-          txHash: txHash
-        }).done(res => {
-          if (res.success) {
-            alert(`Thanh toán thành công!\nMã giao dịch:\n${txHash}`);
-            window.location.href = '/my-tickets';
-          }
-        });
-
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        if (accounts.length > 0) {
+          updateWalletUI(accounts[0]);
+        }
       } catch (err) {
         console.error(err);
-        alert('Giao dịch bị hủy hoặc lỗi: ' + (err.message || ''));
-        $(this).text('Thanh toán ví Metamask').prop('disabled', false);
+        alert("Kết nối bị từ chối hoặc lỗi.");
+      }
+    }
+
+    // --- SỰ KIỆN TỰ ĐỘNG ---
+    window.addEventListener('load', async () => {
+      updateTotal();
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.listAccounts(); // Kiểm tra xem đã connect từ trước chưa
+
+        if (accounts.length > 0) {
+          updateWalletUI(accounts[0].address);
+        }
+
+        // Lắng nghe sự kiện: Người dùng đổi ví trong MetaMask
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length > 0) {
+            updateWalletUI(accounts[0]);
+          } else {
+            updateWalletUI(null); // Người dùng disconnect hẳn trong MetaMask
+          }
+        });
       }
     });
+
+    // Gán sự kiện click cho nút
+    $('#connectWalletBtn').click(handleWalletAction);
+    // Bước 1: Bấm nút thanh toán -> Tạo đơn hàng trên Database trước
+    $('#confirmPayment').click(async function () {
+      if (!currentAccount) return alert('Vui lòng kết nối ví trước!');
+
+      const btn = $(this);
+      btn.text('Đang khởi tạo đơn hàng...').prop('disabled', true);
+
+      const totalVND = price * multiplier * qty;
+
+      // Gọi API tạo đơn hàng (Pending) để lấy OrderID
+      $.post('/create-pending-order', {
+        eventId: '<%= event._id %>',
+        userId: '<%= user._id %>',
+        ticketType: type,
+        quantity: qty,
+        totalAmount: totalVND
+      }).done(async (res) => {
+        if (res.success) {
+          // Có OrderID rồi thì mới gọi Smart Contract
+          await buyTicket(res.orderId, btn);
+        } else {
+          alert('Lỗi tạo đơn hàng: ' + res.message);
+          btn.text('Thanh toán ví Metamask').prop('disabled', false);
+        }
+      }).fail((err) => {
+        alert('Lỗi kết nối Server');
+        btn.text('Thanh toán ví Metamask').prop('disabled', false);
+      });
+    });
+
+    // Bước 2: Gọi Smart Contract (Tách ra hàm riêng cho gọn)
+    async function buyTicket(orderId, btnElement) {
+      const statusDiv = document.getElementById("walletStatus");
+
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        // A. Xin chữ ký từ Backend
+        statusDiv.innerText = "Đang xin chữ ký bảo mật...";
+
+        // Lưu ý: URL này phải đúng với route backend Nodejs của bạn
+        const response = await fetch('/api/get-signature', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderId, userAddress: currentAccount })
+        });
+
+                const data = await response.json();
+                if (!data.signature) throw new Error("Server không cấp chữ ký!");
+        
+                // B. Gọi Smart Contract và KIỂM TRA SỐ DƯ (Bản nâng cấp)
+                statusDiv.innerText = "Đang kiểm tra số dư và ước tính phí...";
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const priceInWei = ethers.toBigInt(data.price);
+        
+                try {
+                    // Ước tính gas cần cho giao dịch
+                    const estimatedGas = await contract.buyTicket.estimateGas(
+                        data.orderId,
+                        priceInWei,
+                        data.signature,
+                        { value: priceInWei }
+                    );
+        
+                    // Lấy giá gas hiện tại
+                    const feeData = await provider.getFeeData();
+                    const gasPrice = feeData.gasPrice;
+                    
+                    // Tính tổng phí gas ước tính
+                    const estimatedGasFee = estimatedGas * gasPrice;
+                    const totalRequired = priceInWei + estimatedGasFee;
+                    const balance = await provider.getBalance(signer.getAddress());
+        
+                    if (balance < totalRequired) {
+                        const format = (val) => ethers.formatEther(val).slice(0, 10);
+                        const msg = `Số dư không đủ.
+                        - Số dư của bạn: ${format(balance)} CFX/ETH
+                        - Tổng yêu cầu: ~${format(totalRequired)} CFX/ETH
+                        (Bao gồm ${format(priceInWei)} cho vé và ~${format(estimatedGasFee)} cho phí giao dịch)
+                        `;
+                        alert(msg);
+                        btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+                        statusDiv.innerText = "Lỗi: Số dư không đủ.";
+                        return;
+                    }
+        
+                } catch (gasError) {
+                     // Bắt cả lỗi nếu việc ước tính gas thất bại (thường do logic hợp đồng)
+                    console.error("Lỗi khi ước tính gas:", gasError);
+                    alert("Không thể ước tính phí giao dịch. Lỗi có thể từ logic smart contract. Chi tiết: " + (gasError.reason || gasError.message));
+                    btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+                    return;
+                }
+                
+        
+                // Nếu đủ tiền, tiến hành giao dịch
+                statusDiv.innerText = "Đang mở MetaMask...";
+                const tx = await contract.buyTicket(
+                  data.orderId,
+                  priceInWei,
+                  data.signature,
+                  { value: priceInWei } 
+                );
+        statusDiv.innerText = "Đang chờ xác nhận trên Blockchain...";
+        btnElement.text('Đang xử lý giao dịch...');
+
+        // Chờ giao dịch hoàn tất
+        await tx.wait();
+
+        // C. Thành công
+        statusDiv.innerText = "✅ Mua thành công!";
+        alert("Giao dịch thành công! Hash: " + tx.hash);
+
+        // Cập nhật lại trạng thái đơn hàng trên Database (Thành Success)
+        $.post('/update-order-success', { orderId: orderId, txHash: tx.hash });
+
+        // Chuyển hướng
+        window.location.href = '/my-tickets';
+
+      } catch (error) {
+        console.error(error);
+        alert("Giao dịch thất bại: " + (error.reason || error));
+        btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+      }
+    }
   </script>
 </body>
 
