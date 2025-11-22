@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/search.css">
+</head>
+<body>
+  <%- include('header') %>
+
+  <div class="search-container">
+    <div class="search-header">
+      <h1><i class="fas fa-search"></i> Tìm kiếm sự kiện</h1>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Nhập tên sự kiện, địa điểm, nghệ sĩ..." value="<%= query || '' %>">
+        <button id="searchBtn"><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+
+    <% if (events && events.length > 0) { %>
+      <div class="results-count">
+        Tìm thấy <strong><%= events.length %></strong> sự kiện cho "<%= query || 'tất cả' %>"
+      </div>
+
+      <div class="events-grid">
+        <% events.forEach(event => { %>
+          <a href="/detail?id=<%= event._id %>" class="event-card">
+            <div class="event-thumb">
+              <img src="<%= event.thumbnail || '/images/default-event.jpg' %>" alt="<%= event.title %>">
+              <div class="event-category"><%= event.category || 'Sự kiện' %></div>
+            </div>
+            <div class="event-info">
+              <h3><%= event.title.length > 50 ? event.title.slice(0,50)+'...' : event.title %></h3>
+              <p><i class="fas fa-calendar-alt"></i> <%= new Date(event.startDate).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+              <p><i class="fas fa-map-marker-alt"></i> <%= event.location || 'Chưa có địa điểm' %></p>
+              <div class="event-price">
+                <% if (event.price && event.price > 0) { %>
+                  Từ <strong><%= event.price.toLocaleString('vi-VN') %>đ</strong>
+                <% } else { %>
+                  <strong>Miễn phí</strong>
+                <% } %>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="no-results">
+        <img src="/images/no-search.svg" alt="Không tìm thấy">
+        <h3>Không tìm thấy sự kiện nào</h3>
+        <p>Hãy thử tìm với từ khóa khác hoặc xem <a href="/">sự kiện nổi bật</a></p>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('footer') %>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+
+    // Tìm kiếm khi nhấn Enter
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') performSearch();
+    });
+
+    // Tìm kiếm khi nhấn nút
+    searchBtn.addEventListener('click', performSearch);
+
+    function performSearch() {
+      const query = searchInput.value.trim();
+      if (query) {
+        window.location.href = `/search?q=${encodeURIComponent(query)}`;
+      } else {
+        window.location.href = '/search';
+      }
+    }
+
+    // Focus vào ô tìm kiếm khi load trang
+    searchInput.focus();
+  </script>
+</body>
+</html>

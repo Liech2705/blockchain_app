@@ -1,0 +1,217 @@
+<footer class="site-footer">
+    <div class="footer-container">
+        
+        <!-- Cột 1: Thông tin liên hệ + Hotline nổi bật -->
+        <div class="footer-col">
+            <div class="contact-item hotline">
+                <i class="fas fa-phone-volume"></i>
+                <div>
+                    <strong>Hotline hỗ trợ</strong><br>
+                    <span class="hotline-big">1900.6408</span><br>
+                    <small>8:00 - 23:00 (Thứ 2 - Chủ Nhật)</small>
+                </div>
+            </div>
+            <div class="contact-item">
+                <i classnelles="fas fa-envelope"></i>
+                <div>
+                    <strong>Email</strong><br>
+                    support@ticketbox.vn
+                </div>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <strong>Văn phòng</strong><br>
+                    Tầng 12, Tòa nhà Viettel, 285 CMT8,<br>Phường 12, Quận 10, TP.HCM
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột 2: Dành cho khách hàng & đối tác -->
+        <div class="footer-col">
+            <h4>Dành cho Khách hàng</h4>
+            <ul>
+                <li><a href="#">Hướng dẫn mua vé</a></li>
+                <li><a href="#">Câu hỏi thường gặp</a></li>
+                <li><a href="#">Điều khoản sử dụng</a></li>
+                <li><a href="#">Chính sách hoàn vé</a></li>
+            </ul>
+
+            <h4 style="margin-top: 28px;">Dành cho Đối tác</h4>
+            <ul>
+                <li><a href="#">Đăng ký tổ chức sự kiện</a></li>
+                <li><a href="#">Hợp tác truyền thông</a></li>
+                <li><a href="#">Quy chế hoạt động</a></li>
+            </ul>
+        </div>
+
+        <!-- Cột 3: Về chúng tôi & mạng xã hội -->
+        <div class="footer-col">
+            <h4>Về Ticketbox</h4>
+            <ul>
+                <li><a href="#">Giới thiệu công ty</a></li>
+                <li><a href="#">Tuyển dụng</a></li>
+                <li><a href="#">Tin tức & Sự kiện</a></li>
+                <li><a href="#">Chính sách bảo mật</a></li>
+                <li><a href="#">Điều kiện giao dịch chung</a></li>
+            </ul>
+
+           
+        </div>
+    </div>
+
+    
+</footer>
+<style>
+    .site-footer {
+        background: #404040;
+        color: #ccc;
+        font-size: 15px;
+        line-height: 1.6;
+        padding-top: 70px;
+    }
+
+    .footer-container {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .footer-container {
+        display: grid;
+        grid-template-columns: 1.8fr 1fr 1fr;
+        gap: 50px;
+    }
+
+    .footer-col h3 {
+        color: #fff;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .footer-col h4 {
+        color: #fff;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 18px;
+        font-weight: 600;
+    }
+
+    .footer-col ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-col ul li {
+        margin-bottom: 10px;
+    }
+
+    .footer-col ul li a {
+        color: #aaa;
+        text-decoration: none;
+        transition: 0.3s ease;
+        display: inline-block;
+    }
+
+    .footer-col ul li a:hover {
+        color: #ff3366;
+        transform: translateX(6px);
+    }
+
+    /* Hotline nổi bật */
+    .hotline {
+        background: linear-gradient(135deg, #ff3366, #ff6b9d);
+        padding: 16px 18px;
+        border-radius: 12px;
+        color: white !important;
+        margin: 20px 0;
+    }
+
+    .hotline i {
+        font-size: 20px;
+        margin-right: 12px;
+    }
+
+    .hotline-big {
+        font-size: 28px;
+        font-weight: 800;
+        display: block;
+        margin: 4px 0;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        color: #ddd;
+    }
+
+    .contact-item i {
+        color: #ff3366;
+        font-size: 18px;
+        width: 30px;
+        margin-top: 4px;
+    }
+
+    /* Social icons */
+    .social-links a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: #333;
+        color: #fff;
+        border-radius: 50%;
+        margin-right: 10px;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+
+    .social-links a:hover {
+        background: #ff3366;
+        transform: translateY(-4px);
+    }
+
+    /* Footer bottom */
+    .footer-bottom {
+        margin-top: 60px;
+        padding: 25px 0;
+        border-top: 1px solid #333;
+        text-align: center;
+        font-size: 14px;
+        color: #777;
+    }
+
+    .certifications img {
+        margin: 10px 8px 0;
+        vertical-align: middle;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .footer-container {
+            grid-template-columns: 1fr;
+            gap: 50px;
+            text-align: center;
+        }
+        .contact-item {
+            justify-content: center;
+        }
+        .hotline-big {
+            font-size: 24px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .site-footer {
+            padding-top: 50px;
+        }
+        .social-links a {
+            width: 44px;
+            height: 44px;
+        }
+    }
+</style>

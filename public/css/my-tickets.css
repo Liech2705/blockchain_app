@@ -1,0 +1,62 @@
+.tickets-container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+.page-header { text-align: center; margin-bottom: 40px; }
+.page-header h1 { font-size: 2.8rem; color: #00d4aa; }
+.page-header p { color: #aaa; font-size: 1.1rem; }
+
+.tickets-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); 
+  gap: 24px; 
+}
+
+.ticket-card {
+  background: #1e1e1e;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,212,170,0.15);
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.ticket-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,212,170,0.3); }
+.ticket-card.paid { border-color: #00d4aa; }
+
+.ticket-header { 
+  display: flex; 
+  background: linear-gradient(135deg, #00d4aa, #0098c3);
+  color: white;
+  padding: 16px;
+}
+
+.event-image img { width: 100px; height: 100px; object-fit: cover; border-radius: 12px; }
+.event-info { padding-left: 16px; flex: 1; }
+.event-info h3 { margin: 0 0 8px 0; font-size: 1.3rem; }
+.event-info p { margin: 4px 0; font-size: 0.95rem; opacity: 0.9; }
+
+.ticket-details {
+  padding: 20px;
+  background: #252525;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detail-item span:first-child { color: #aaa; font-size: 0.9rem; }
+.detail-item strong { color: #00d4aa; font-weight: 600; }
+.price { font-size: 1.3rem !important; color: #00f0b8 !important; }
+
+.status.success { color: #00f0b8; background: rgba(0,240,184,0.2); padding: 4px 12px; border-radius: 20px; }
+.status.warning { color: #ff9f43; background: rgba(255,159,67,0.2); padding: 4px 12px; border-radius: 20px; }
+
+.ticket-qr { text-align: center; padding: 20px; background: white; color: black; }
+.qrcode { margin: 10px auto; }
+
+.btn-download, .btn-pay {
+  width: 100%; padding: 14px; font-weight: bold; border: none; cursor: pointer; font-size: 1.1rem;
+}
+.btn-download { background: #00d4aa; color: black; }
+.btn-pay { background: #ff4757; color: white; }
+
+.empty-state { text-align: center; padding: 80px 20px; color: #aaa; }
+.empty-state img { width: 200px; opacity: 0.5; margin-bottom: 20px; }
+.btn-primary { background: #00d4aa; color: black; padding: 12px 32px; border-radius: 50px; text-decoration: none; font-weight: bold; }

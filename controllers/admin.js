@@ -8,7 +8,7 @@ const isAdmin = (req, res, next) => {
     res.redirect('/login');
 };
 
-module.exports = function(app) {
+module.exports = function (app) {
     app.get('/login', (req, res) => {
         res.render('dangnhap');
     });

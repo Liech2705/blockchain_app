@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> EventHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/my-tickets.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <%- include('header') %>
+
+  <div class="tickets-container">
+    <div class="page-header">
+      <h1>Vé của tôi</h1>
+    </div>
+
+    <% if (orders && orders.length > 0) { %>
+      <div class="tickets-grid">
+        <% orders.forEach(order => { %>
+          <div class="ticket-card <%= order.status === 'completed' ? 'paid' : 'pending' %>">
+            <div class="ticket-header">
+              <div class="event-image">
+                <img src="<%= order.event.thumbnail || '/images/default-event.jpg' %>" alt="<%= order.event.title %>">
+              </div>
+              <div class="event-info">
+                <h3><%= order.event.title %></h3>
+                <p><i class="fas fa-map-marker-alt"></i> <%= order.event.location %></p>
+                <p><i class="fas fa-map-marker-alt"></i> <%= order.event.startDate %></p>
+              </div>
+            </div>
+
+            <div class="ticket-details">
+              <div class="detail-item">
+                <span>Số lượng vé</span>
+                <strong><%= order.items.reduce((sum, item) => sum + item.quantity, 0) %> vé</strong>
+              </div>
+              <div class="detail-item">
+                <span>Tổng tiền</span>
+                <strong class="price"><%= order.totalAmount.toLocaleString('vi-VN') %> đ</strong>
+              </div>
+              <div class="detail-item">
+                <span>Trạng thái</span>
+                <span class="status <%= order.status === 'completed' ? 'success' : 'warning' %>">
+                  <%= order.status === 'completed' ? 'Paid' : 'Pending' %>
+                </span>
+              </div>
+            </div>
+
+            <% if (order.status === 'completed') { %>
+              <div class="ticket-qr">
+                <div id="qrcode-<%= order._id %>" class="qrcode"></div>
+                <small>Mã vé: <%= order._id.toString().slice(-8).toUpperCase() %></small>
+              </div>
+              <button class="btn-download" onclick="downloadTicket('<%= order._id %>')">
+                Tải vé (PDF)
+              </button>
+            <% } else { %>
+              
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <img src="/images/empty-tickets.svg" alt="Chưa có vé">
+        <h3>Bạn chưa có vé nào</h3>
+        <p>Hãy khám phá các sự kiện hấp dẫn và đặt vé ngay hôm nay!</p>
+        <a href="/" class="btn-primary">Xem sự kiện</a>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('footer') %>
+
+  <script>
+    // Tạo QR code cho từng vé đã thanh toán
+    document.querySelectorAll('[id^="qrcode-"]').forEach(el => {
+      const orderId = el.id.replace('qrcode-', '');
+      new QRCode(el, {
+        text: orderId,
+        width: 120,
+        height: 120,
+        colorDark: "#000",
+        colorLight: "#fff"
+      });
+    });
+
+    // Tải vé PDF (sẽ làm sau)
+    function downloadTicket(orderId) {
+      alert("Tính năng tải vé PDF đang phát triển!");
+    }
+  </script>
+</body>
+</html>
