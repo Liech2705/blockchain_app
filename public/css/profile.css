@@ -1,0 +1,218 @@
+/* ========================================
+   PROFILE PAGE - Thiết kế hiện đại 2025
+   ======================================== */
+
+* { box-sizing: border-box; }
+
+body {
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: #e0e0e0;
+}
+
+.profile-container {
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 20px;
+}
+
+.profile-card {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(0, 212, 170, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 212, 170, 0.2);
+}
+
+/* Header gradient xanh neon */
+.profile-header {
+  background: linear-gradient(135deg, #00d4aa, #00b894, #0098c3);
+  padding: 50px 30px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><circle cx="20" cy="20" r="15" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="20" fill="rgba(255,255,255,0.08)"/></svg>');
+  opacity: 0.3;
+}
+
+.profile-header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.profile-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Form layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 40px;
+}
+
+/* Input nhóm */
+.form-group {
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #00d4aa;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(50, 50, 50, 0.8);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #00d4aa;
+  background: rgba(0, 212, 170, 0.1);
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Phần đổi mật khẩu - nổi bật */
+.password-section {
+  grid-column: 1 / -1;
+  background: rgba(0, 212, 170, 0.08);
+  border: 2px dashed rgba(0, 212, 170, 0.3);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 20px 40px;
+}
+
+.password-section h3 {
+  color: #00f0b8;
+  font-size: 1.3rem;
+  margin: 0 0 25px 0;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+}
+
+.password-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #00d4aa, transparent);
+  border-radius: 2px;
+}
+
+/* Nút hành động */
+.form-actions {
+  padding: 30px 40px;
+  text-align: center;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #00d4aa, #00f0b8);
+  color: #000;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
+  transition: all 0.4s ease;
+  min-width: 180px;
+}
+
+.btn-save:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(0, 212, 170, 0.6);
+  background: linear-gradient(135deg, #00f0b8, #00d4aa);
+}
+
+.btn-cancel {
+  background: rgba(100, 100, 100, 0.5);
+  color: #ccc;
+  padding: 14px 32px;
+  border: 2px solid rgba(150, 150, 150, 0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  min-width: 140px;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border-color: #ff4757;
+}
+
+/* Toast thông báo */
+#toast {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background: linear-gradient(135deg, #00d4aa, #00f0b8);
+  color: #000;
+  padding: 18px 40px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 10px 30px rgba(0, 212, 170, 0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-container { padding: 10px; margin: 20px auto; }
+  .profile-header { padding: 40px 20px; }
+  .profile-header h1 { font-size: 2rem; }
+  .form-grid { padding: 20px; gap: 20px; }
+  .password-section { margin: 20px; padding: 25px; }
+  .form-actions { flex-direction: column; align-items: center; }
+  .btn-save, .btn-cancel { width: 100%; max-width: 300px; }
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> EventHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+  <%- include('header') %>
+
+  <div class="profile-container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <h1>Hồ sơ cá nhân</h1>
+        <p>Cập nhật thông tin và đổi mật khẩu của bạn</p>
+      </div>
+
+      <form id="profileForm">
+        <div class="form-grid">
+          <!-- Họ tên -->
+          <div class="form-group">
+            <label>Họ và tên *</label>
+            <input type="text" name="HoTen" value="<%= user.HoTen %>" required>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" name="Email" value="<%= user.Email %>" required>
+          </div>
+
+          <!-- Số điện thoại -->
+          <div class="form-group">
+            <label>Số điện thoại *</label>
+            <input type="tel" name="SoDT" value="<%= user.SoDT || '' %>" required>
+          </div>
+        </div>
+
+        <!-- PHẦN ĐỔI MẬT KHẨU -->
+        <div class="password-section">
+          <h3>Đổi mật khẩu (để trống nếu không muốn đổi)</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Mật khẩu hiện tại</label>
+              <input type="password" name="currentPassword" placeholder="Nhập mật khẩu cũ">
+            </div>
+            <div class="form-group"></div>
+
+            <div class="form-group">
+              <label>Mật khẩu mới</label>
+              <input type="password" name="newPassword" placeholder="Tối thiểu 6 ký tự">
+            </div>
+
+            <div class="form-group">
+              <label>Nhập lại mật khẩu mới</label>
+              <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-save">Lưu thay đổi</button>
+          <button type="button" class="btn-cancel" onclick="history.back()">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <%- include('footer') %>
+
+  <!-- Toast thông báo -->
+  <div id="toast">Cập nhật thành công!</div>
+
+  <script>
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+
+      // Kiểm tra nếu đổi mật khẩu
+      if (data.newPassword || data.confirmPassword || data.currentPassword) {
+        if (!data.currentPassword) return alert('Vui lòng nhập mật khẩu hiện tại!');
+        if (data.newPassword.length < 6) return alert('Mật khẩu mới phải từ 6 ký tự trở lên!');
+        if (data.newPassword !== data.confirmPassword) return alert('Mật khẩu xác nhận không khớp!');
+      }
+
+      try {
+        const res = await fetch('/update-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          document.getElementById('toast').classList.add('show');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          alert(result.message || 'Cập nhật thất bại!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối server');
+      }
+    });
+  </script>
+</body>
+</html>

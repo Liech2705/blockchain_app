@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/dangky.css">
+    
+    <style>
+        .password-wrapper {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1.2rem;
+        }
+        .toggle-password:hover { color: #00b894; }
+        .error-text {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .success-text {
+            color: #00b894;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Đăng Ký Tài Khoản</h1>
+            <p>Tạo tài khoản để mua vé & quản lý đơn hàng dễ dàng</p>
+        </div>
+
+        <div class="form-container">
+            <form id="frmDangKy">
+                <div class="form-group">
+                    <label for="txtHoTen">Họ và tên <span style="color:red">*</span></label>
+                    <input type="text" id="txtHoTen" placeholder="Nguyễn Văn A" required />
+                    <div class="error-text" id="errHoTen">Vui lòng nhập họ tên</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtEmail">Email <span style="color:red">*</span></label>
+                    <input type="email" id="txtEmail" placeholder="example@gmail.com" required />
+                    <div class="error-text" id="errEmail">Email không hợp lệ</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtSoDT">Số điện thoại <span style="color:red">*</span></label>
+                    <input type="tel" id="txtSoDT" placeholder="0901234567" required />
+                    <div class="error-text" id="errSoDT">Số điện thoại không hợp lệ</div>
+                </div>
+
+                <!-- MẬT KHẨU MỚI -->
+                <div class="form-group">
+                    <label for="txtPassword">Mật khẩu <span style="color:red">*</span></label>
+                    <div class="password-wrapper">
+                        <input type="password" id="txtPassword" placeholder="Ít nhất 6 ký tự" required />
+                        <i class="fas fa-eye toggle-password" onclick="togglePass('txtPassword')"></i>
+                    </div>
+                    <div class="error-text" id="errPassword">Mật khẩu phải từ 6 ký tự trở lên</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtConfirmPassword">Xác nhận mật khẩu <span style="color:red">*</span></label>
+                    <div class="password-wrapper">
+                        <input type="password" id="txtConfirmPassword" placeholder="Nhập lại mật khẩu" required />
+                        <i class="fas fa-eye toggle-password" onclick="togglePass('txtConfirmPassword')"></i>
+                    </div>
+                    <div class="error-text" id="errConfirm">Mật khẩu xác nhận không khớp</div>
+                </div>
+
+                <button type="button" class="btn-submit" id="btnDangKy">
+                    <i class="fas fa-user-plus"></i> Đăng Ký Ngay
+                </button>
+
+                <div class="success-text" id="successMsg" style="display:none;">
+                    Đăng ký thành công! Đang chuyển đến thanh toán...
+                </div>
+            </form>
+
+            <div class="footer-text">
+                Đã có tài khoản? <a href="/login" style="color:#00b894; font-weight:600;">Đăng nhập ngay</a><br>
+                Thông tin của bạn được bảo mật tuyệt đối
+            </div>
+        </div>
+    </div>
+
+<% if (eventId) { %>
+  <input type="hidden" id="eventId" value="<%= eventId %>">
+<% } %>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+function togglePass(id) {
+    const input = document.getElementById(id);
+    const icon = input.nextElementSibling;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+$(document).ready(function() {
+    $('#btnDangKy').on('click', function() {
+        // Reset lỗi
+        $('.error-text').hide();
+
+        const HoTen = $('#txtHoTen').val().trim();
+        const Email = $('#txtEmail').val().trim();
+        const SoDT = $('#txtSoDT').val().trim();
+        const Password = $('#txtPassword').val();
+        const ConfirmPassword = $('#txtConfirmPassword').val();
+        const eventId = $('#eventId').val() || '';
+
+        let hasError = false;
+
+        if (!HoTen) { $('#errHoTen').show(); hasError = true; }
+        if (!Email || !/^\S+@\S+\.\S+$/.test(Email)) { $('#errEmail').show(); hasError = true; }
+        if (!SoDT || !/^0[3|5|7|8|9][0-9]{8}$/.test(SoDT)) { $('#errSoDT').show(); hasError = true; }
+        if (!Password || Password.length < 6) { $('#errPassword').show(); hasError = true; }
+        if (Password !== ConfirmPassword) { $('#errConfirm').show(); hasError = true; }
+
+        if (hasError) return;
+
+        $('#btnDangKy').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang xử lý...');
+
+        $.post('/dangky', {
+            HoTen: HoTen,
+            Email: Email,
+            SoDT: SoDT,
+            Password: Password,        // ← Gửi mật khẩu về backend
+            eventId: eventId
+        })
+    .done(function(data) {
+    if (data.ketqua === 1) {
+        $('#successMsg').text(data.thongbao || 'Đăng ký thành công!').show();
+        $('#btnDangKy').html('<i class="fas fa-check"></i> Hoàn tất');
+
+        // Chuyển hướng theo kết quả từ server
+        setTimeout(() => {
+            window.location.href = data.redirect || '/';
+        }, 1200);
+    } else {
+        alert(data.maloi || 'Đăng ký thất bại');
+        $('#btnDangKy').prop('disabled', false).html('<i class="fas fa-user-plus"></i> Đăng Ký Ngay');
+    }
+})
+        .fail(function() {
+            alert('Lỗi kết nối server!');
+            $('#btnDangKy').prop('disabled', false).html('<i class="fas fa-user-plus"></i> Đăng Ký Ngay');
+        });
+    });
+});
+</script>
+
+</body>
+</html>

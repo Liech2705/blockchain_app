@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'EventHub - Nền tảng Sự kiện' %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="./css/layout.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="/process.js"></script> 
+  <script src="/scripts/web3.min.js"></script>
+</head>
+<body>
+  
+  <div class="layout-wrapper">
+    <%- include('header') %>
+
+    <main class="main-content">
+      <!-- Sự kiện xu hướng -->
+      <section class="trending-events">
+        <div class="trending-grid">
+          <% if (trendingEvents && trendingEvents.length) { %>
+            <% trendingEvents.forEach(function(event) { %>
+              <a href="/detail?id=<%= event._id %>" style="text-decoration:none;color:inherit;">
+                <div class="trending-card">
+                  <img src="<%= event.thumbnail %>" alt="<%= event.title %>">
+                  <div class="card-title"><%= event.title %></div>
+                      <div class="meta-item"><%= event.startDate %></div>
+                  <div class="price-tag">
+                    <%= (event.price || 0).toLocaleString('vi-VN') %> VND
+                  </div>
+                </div>
+              </a>
+            <% }); %>
+          <% } else { %>
+            <p style="color:#bbb;">Không có sự kiện xu hướng</p>
+          <% } %>
+        </div>
+      </section>
+      
+
+      
+    </main>
+        <%- include('footer') %>
+
+
+  </div>
+
+  <!-- Loading & Toast -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Global Scripts -->
+  <script>
+    window.showToast = function(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.innerHTML = `
+        <strong>${type === 'error' ? 'Lỗi' : type === 'warning' ? 'Cảnh báo' : 'Thành công'}</strong>
+        ${message}
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    };
+
+    window.showLoading = () => document.getElementById('loadingOverlay').classList.add('active');
+    window.hideLoading = () => document.getElementById('loadingOverlay').classList.remove('active');
+
+    if (typeof web3 !== 'undefined') {
+      console.log('Web3 detected');
+    }
+  </script>
+</body>
+</html>

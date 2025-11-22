@@ -1,0 +1,155 @@
+<%- include('../layout.ejs') %>
+
+<style>
+    :root {
+        --primary-color: #00d4aa;
+        --background-color: #121212;
+        --card-color: #1e1e1e;
+        --text-color: #ffffff;
+        --border-color: #3a3a3a;
+        --hover-color: #2a2a2a;
+    }
+
+    .admin-container {
+        padding: 40px;
+        background-color: var(--background-color);
+        min-height: 100vh;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .admin-header h2 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .add-btn {
+        background-color: var(--primary-color);
+        color: #121212;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .add-btn:hover {
+        background-color: #00b894;
+        transform: translateY(-2px);
+    }
+
+    .admin-card {
+        background-color: var(--card-color);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--border-color);
+    }
+
+    .events-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .events-table th, .events-table td {
+        padding: 15px;
+        text-align: left;
+    }
+
+    .events-table thead {
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .events-table th {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #a0a0a0;
+        text-transform: uppercase;
+    }
+
+    .events-table tbody tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s ease;
+    }
+
+    .events-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .events-table tbody tr:hover {
+        background-color: var(--hover-color);
+    }
+
+    .events-table td {
+        color: var(--text-color);
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .edit-btn {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    .edit-btn:hover {
+        background-color: #303f9f;
+    }
+
+    .delete-btn {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .delete-btn:hover {
+        background-color: #d32f2f;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h2>Quản lý sự kiện</h2>
+        <a href="/admin/events/add" class="add-btn">Add Event</a>
+    </div>
+    <div class="admin-card">
+        <table class="events-table">
+            <thead>
+                <tr>
+                    <th>Tiêu đề</th>
+                    <th>Địa điểm</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% events.forEach(event => { %>
+                    <tr>
+                        <td><%= event.title %></td>
+                        <td><%= event.location %></td>
+                        <td><%= event.startDate ? new Date(event.startDate).toLocaleDateString() : 'N/A' %></td>
+                        <td><%= event.endDate ? new Date(event.endDate).toLocaleDateString() : 'N/A' %></td>
+                        <td><%= event.status %></td>
+                        <td>
+                            <a href="/admin/events/edit/<%= event._id %>" class="action-btn edit-btn">Sửa</a>
+                            <a href="/admin/events/delete/<%= event._id %>" class="action-btn delete-btn">Xóa</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>

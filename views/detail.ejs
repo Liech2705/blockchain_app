@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= event.title %> - Chi tiết sự kiện</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/detail.css" />
+    <link rel="stylesheet" href="./css/layout.css" />
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="/process.js"></script>
+</head>
+
+<body>
+  <div class="layout-wrapper">
+    <%- include('header') %>
+    <main class="main-content">
+    <div class="event-card">
+      <!-- Thông tin bên trái -->
+      <div class="event-info">
+        <div>
+          <h1 class="event-title"><%= event.title %></h1>
+
+          <div class="event-meta">
+            <div class="meta-item">Thời gian: <%= event.startDate %></div>
+            <div class="meta-item">Địa điểm: <%= event.location %></div>
+            <div class="meta-item">Thể loại: <%= event.category %></div>
+          </div>
+
+          <div class="price">Giá vé: <strong><%= (event.price || 0).toLocaleString('vi-VN') %> đ</strong></div>
+        </div>
+
+        <!-- NÚT THÔNG MINH - TỰ ĐỘNG PHÁT HIỆN ĐÃ LOGIN HAY CHƯA -->
+        <button class="register-btn" id="registerBtn">
+          <% if (user) { %>
+            Mua vé ngay
+          <% } else { %>
+            Đăng ký nhận vé
+          <% } %>
+        </button>
+
+        <script>
+          document.getElementById('registerBtn').addEventListener('click', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('id');
+
+            if (!eventId) {
+              alert("Không tìm thấy ID sự kiện!");
+              return;
+            }
+
+            <% if (user) { %>
+              // ĐÃ ĐĂNG NHẬP → NHẢY THẲNG VÀO ORDER
+              window.location.href = `/order?eventId=${eventId}&email=<%= encodeURIComponent(user.Email) %>`;
+            <% } else { %>
+              // CHƯA ĐĂNG NHẬP → VÀO TRANG ĐĂNG KÝ
+              window.location.href = `/dangky?eventId=${eventId}`;
+            <% } %>
+          });
+        </script>
+      </div>
+
+      <!-- Poster bên phải -->
+      <div class="event-poster">
+        <img src="<%= event.thumbnail %>" alt="<%= event.title %>">
+      </div>
+    </div>
+
+    <!-- PHẦN GIỚI THIỆU -->
+    <div class="intro-section">
+      <h2 class="section-title">Giới thiệu</h2>
+      <div class="event-fullname"><%= event.title %></div>
+      <p class="intro-text">
+        <%= event.description || 'Thông tin thời gian và địa điểm chưa được cập nhật.' %>
+      </p>
+    </div>
+  </div>
+
+  <%- include('footer') %>
+</body>
+</html>

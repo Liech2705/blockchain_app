@@ -1,0 +1,150 @@
+<link rel="stylesheet" href="/css/header.css">
+
+<header class="main-header">
+  <div class="header-container">
+    <!-- Logo -->
+    <div class="header-logo">
+      <a href="/">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18" fill="url(#gradient)" stroke="#00c853" stroke-width="2"/>
+          <path d="M20 10L25 18H15L20 10Z" fill="white"/>
+          <path d="M20 30L25 22H15L20 30Z" fill="white"/>
+          <defs>
+            <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0%" stop-color="#00c853"/>
+              <stop offset="100%" stop-color="#64dd17"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">EventHub</span>
+      </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="header-search">
+      <input type="text" placeholder="Tìm kiếm sự kiện..." class="search-input" id="searchInput">
+      <button class="search-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- User Menu (Desktop) -->
+   <!-- Thay toàn bộ phần User Menu (Desktop) bằng đoạn này -->
+<div class="user-menu-desktop">
+  <% if (user) { %>
+    <div class="user-dropdown" style="margin-left: auto;">
+      <button class="user-btn" id="userBtn">
+        <span class="user-avatar">
+<img src="/image/user.png" alt="avatar" style="width:35px; height:35px; border-radius:50%;">
+        </span>
+        <span class="user-name"><%= user.HoTen.split(' ').slice(-1)[0] %></span>
+        <% if (user.role === 'admin') { %>
+          <span class="admin-badge">Admin</span>
+        <% } %>
+        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-header">
+          <strong><%= user.HoTen %></strong>
+          <small><%= user.Email %></small>
+        </div>
+        <a href="/profile" class="dropdown-item">Hồ sơ cá nhân</a>
+        <a href="/my-tickets" class="dropdown-item">Vé của tôi</a>
+        
+        <% if (user.role === 'admin') { %>
+          <div class="dropdown-divider"></div>
+          <a href="/admin/users" class="dropdown-item admin">Quản trị hệ thống</a>
+        <% } %>
+
+        <div class="dropdown-divider"></div>
+        <a href="/logout" class="dropdown-item logout">Đăng xuất</a>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="auth-buttons" style="margin-left: auto;">
+      <a href="/dangky" class="btn-outline">Đăng ký</a>
+      <a href="/login" class="btn-primary">Đăng nhập</a>
+    </div>
+  <% } %>
+</div>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Danh mục sự kiện -->
+  <section class="categories">
+    <div class="category-list">
+      <% if (categories && categories.length) { %>
+        <% categories.forEach(function(cat) { %>
+          <a href="/category/<%= encodeURIComponent(cat) %>" class="category-tag"><%= cat %></a>
+        <% }); %>
+      <% } else { %>
+        <span style="color:#bbb">Không có danh mục</span>
+      <% } %>
+    </div>
+  </section>
+</header>
+
+<!-- Mobile Navigation (ẩn mặc định) -->
+<nav class="mobile-nav" id="mobileNav">
+  <% if (user) { %>
+    <div class="mobile-user-info">
+      <div class="user-avatar-large"><%= user.HoTen.charAt(0).toUpperCase() %></div>
+      <div>
+        <strong><%= user.HoTen %></strong>
+        <small><%= user.Email %></small>
+      </div>
+    </div>
+    <a href="/my-tickets" class="mobile-nav-item">Vé của tôi</a>
+    <% if (user.role === 'admin') { %>
+      <a href="/admin/users" class="mobile-nav-item admin">Quản trị hệ thống</a>
+    <% } %>
+    <a href="/logout" class="mobile-nav-item logout">Đăng xuất</a>
+  <% } else { %>
+    <a href="/login" class="mobile-nav-item">Đăng nhập</a>
+    <a href="/dangky" class="mobile-nav-item">Đăng ký</a>
+  <% } %>
+</nav>
+
+<script>
+  // User dropdown toggle
+  document.getElementById('userBtn')?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('dropdownMenu').classList.toggle('active');
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-dropdown')) {
+      document.getElementById('dropdownMenu')?.classList.remove('active');
+    }
+  });
+
+  // Mobile menu toggle
+  document.getElementById('mobileMenuToggle')?.addEventListener('click', function() {
+    document.getElementById('mobileNav').classList.toggle('active');
+    document.body.classList.toggle('menu-open');
+  });
+
+  // Search functionality
+  document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const query = this.value.trim();
+      if (query) window.location.href = '/search?q=' + encodeURIComponent(query);
+    }
+  });
+
+  document.querySelector('.search-btn')?.addEventListener('click', function() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (query) window.location.href = '/search?q=' + encodeURIComponent(query);
+  });
+</script>

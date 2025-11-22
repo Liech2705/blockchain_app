@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= event.title %>
+  </title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Giữ nguyên toàn bộ CSS cũ của bạn */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #121212;
+      color: #fff;
+      padding: 20px 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .payment-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .user-section {
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      color: #00d4aa;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #2a2a2a;
+    }
+
+    .user-info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .event-section {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-poster {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stage-light {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 212, 170, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+    }
+
+    .letter-A {
+      position: absolute;
+      font-size: 200px;
+      font-weight: bold;
+      color: rgba(0, 212, 170, 0.15);
+      pointer-events: none;
+    }
+
+    .event-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-details {
+      padding: 32px;
+      background: #1a1a1a;
+      color: white;
+    }
+
+    .event-title {
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      color: #00d4aa;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .meta-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      stroke: #00d4aa;
+      fill: none;
+    }
+
+    .ticket-selection {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      border: 1px solid rgba(0, 212, 170, 0.2);
+    }
+
+    .ticket-type {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .ticket-type:hover {
+      background: rgba(0, 212, 170, 0.15);
+    }
+
+    .ticket-type.selected {
+      background: rgba(0, 212, 170, 0.25);
+      border: 2px solid #00d4aa;
+    }
+
+    .type-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .type-price {
+      color: #00d4aa;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 20px 0;
+      font-size: 1.5rem;
+    }
+
+    .quantity-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #333;
+      color: white;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .quantity-btn:hover {
+      background: #00d4aa;
+    }
+
+    .total-price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00d4aa;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 212, 170, 0.1);
+      border-radius: 12px;
+      margin: 24px 0;
+    }
+
+    .register-btn {
+      width: 100%;
+      background: linear-gradient(45deg, #00d4aa, #00b894);
+      color: white;
+      padding: 18px 0;
+      font-size: 1.3rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+    }
+
+    .register-btn:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+
+    .wallet-status {
+      text-align: center;
+      margin: 16px 0;
+      font-size: 1rem;
+      color: #aaa;
+    }
+
+    @media (max-width: 968px) {
+      .payment-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="payment-layout">
+      <!-- Bên trái: Thông tin người dùng (giữ nguyên) -->
+      <div class="user-section">
+        <h2 class="section-title">Thông tin người đăng ký</h2>
+        <div class="user-info-grid">
+          <div class="info-item"><span class="info-label">Họ và tên</span><span class="info-value">
+              <%= user.HoTen %>
+            </span></div>
+          <div class="info-item"><span class="info-label">Email</span><span class="info-value">
+              <%= user.Email %>
+            </span></div>
+          <div class="info-item"><span class="info-label">Số điện thoại</span><span class="info-value">
+              <%= user.SoDT %>
+            </span></div>
+        </div>
+      </div>
+
+      <!-- Bên phải: Sự kiện + Chọn vé -->
+      <div class="event-section">
+        <div class="event-poster">
+          <div class="stage-light"></div>
+          <div class="letter-A">A</div>
+          <img src="<%= event.thumbnail || '/images/default-event.jpg' %>" alt="<%= event.title %>">
+        </div>
+
+        <div class="event-details">
+          <h1 class="event-title">
+            <%= event.title %>
+          </h1>
+
+          <div class="event-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <div><strong>Thời gian:</strong><br>
+                <%= event.startDate ? new Date(event.startDate).toLocaleDateString('vi-VN',
+                  {weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})
+                  : 'Chưa xác định' %>
+              </div>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <div><strong>Địa điểm:</strong><br>
+                <%= event.location || 'Chưa xác định' %>
+              </div>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 017 12V7z" />
+              </svg>
+              <div><strong>Thể loại:</strong><br>
+                <%= event.category || 'Chưa phân loại' %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chọn vé -->
+          <div class="ticket-selection">
+            <h3 style="color:#00d4aa; margin-bottom:16px;">Chọn loại vé</h3>
+
+            <div class="ticket-type selected" data-type="Normal" data-price="<%= event.price || 0 %>">
+              <div>
+                <div class="type-name">Normal (Thường)</div><small>Ghế khu tự do</small>
+              </div>
+              <div class="type-price">
+                <%= (event.price || 0).toLocaleString('vi-VN') %> đ
+              </div>
+            </div>
+
+            <div class="ticket-type" data-type="VIP" data-price="<%= (event.price || 0) * 3 %>">
+              <div>
+                <div class="type-name">VIP</div><small>Ghế gần sân khấu + quà tặng</small>
+              </div>
+              <div class="type-price">
+                <%= ((event.price || 0) * 3).toLocaleString('vi-VN') %> đ
+              </div>
+            </div>
+
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn" id="decrease">-</button>
+              <span id="quantity">1</span>
+              <button type="button" class="quantity-btn" id="increase">+</button>
+            </div>
+
+            <div class="total-price">
+              Tổng tiền: <span id="totalAmount">
+                <%= event.price || 0 %>
+              </span> đ
+            </div>
+          </div>
+
+          <!-- Trạng thái ví -->
+          <div class="wallet-status" id="walletStatus">Chưa kết nối ví Metamask</div>
+          <!-- NÚT CONNECT METAMASK NHỎ XINH -->
+          <button id="connectWalletBtn" style="
+              margin-top: 12px;
+              padding: 10px 20px;
+              background: transparent;
+              border: 2px solid #00d4aa;
+              color: #00d4aa;
+              border-radius: 30px;
+              font-weight: 600;
+              font-size: 0.95rem;
+              cursor: pointer;
+              transition: all 0.3s;
+            ">
+            Kết nối ví Metamask
+          </button>
+        </div>
+        <button class="register-btn" id="confirmPayment">
+          Thanh toán ví Metamask
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+
+  <script>
+    // --- CẤU HÌNH ---
+    const CONTRACT_ADDRESS = "0x569c9B6864703b967382Af6c6014dE003A4ea437";
+    // ABI rút gọn (chỉ giữ hàm cần dùng cho nhẹ code)
+    const CONTRACT_ABI = [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_signer",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "ECDSAInvalidSignature",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "length",
+            "type": "uint256"
+          }
+        ],
+        "name": "ECDSAInvalidSignatureLength",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "name": "ECDSAInvalidSignatureS",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "_OrderId",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "_Sent",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "_Received",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "_ChainId",
+            "type": "uint256"
+          }
+        ],
+        "name": "TicketPurchased",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "_OrderId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "_signature",
+            "type": "bytes"
+          }
+        ],
+        "name": "buyTicket",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "customers",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "_OrderId",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "_Vi",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllCustomers",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "_OrderId",
+                "type": "string"
+              },
+              {
+                "internalType": "address",
+                "name": "_Vi",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct BuyTicket.Customer[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "signerAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ];
+    let currentAccount = "";
+    let price = Number("<%= event.price || 0 %>");
+    let type = 'Normal';
+    let multiplier = 1;
+    let qty = 1;
+    // const RPC_URL = "https://evmtestnet.confluxrpc.com";
+    // const provider = new ethers.JsonRpcProvider(RPC_URL);
+
+    // async function loadAllData() {
+    //   const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+    //   try {
+    //     // Gọi 1 lần lấy hết sạch dữ liệu
+    //     const allData = await contract.getAllCustomers();
+
+    //     console.log("Tổng số đơn:", allData.length);
+
+    //     // Duyệt mảng để hiển thị
+    //     // Lưu ý: Dữ liệu trả về dạng Array của các Array/Struct
+    //     allData.forEach((customer, index) => {
+    //       // customer[0] là OrderId
+    //       // customer[1] là Ví Address
+    //       // Hoặc có thể gọi customer._OrderId nếu Ethers version mới hỗ trợ
+    //       console.log(`Đơn hàng số ${index}: ID=${customer[0]}, Ví=${customer[1]}`);
+
+    //       // Render ra HTML ở đây...
+    //       // $('#list').append(`<li>${customer[1]} mua vé ${customer[0]}</li>`);
+    //     });
+
+    //   } catch (err) {
+    //     console.error("Lỗi:", err);
+    //   }
+    // }
+
+    // loadAllData();
+    // --- HÀM XỬ LÝ GIAO DIỆN ---
+    function updateTotal() {
+      const total = price * multiplier * qty;
+      $('#totalAmount').text(total.toLocaleString('vi-VN'));
+    }
+
+    $('.ticket-type').click(function () {
+      $('.ticket-type').removeClass('selected');
+      $(this).addClass('selected');
+      type = $(this).data('type');
+      multiplier = type === 'VIP' ? 3 : 1;
+      updateTotal();
+    });
+
+    $('#increase').click(() => { qty = Math.min(qty + 1, 20); $('#quantity').text(qty); updateTotal(); });
+    $('#decrease').click(() => { if (qty > 1) qty--; $('#quantity').text(qty); updateTotal(); });
+
+    // --- HÀM CẬP NHẬT UI KHI TRẠNG THÁI VÍ THAY ĐỔI ---
+    function updateWalletUI(account) {
+      if (account) {
+        // Trạng thái: ĐÃ KẾT NỐI
+        currentAccount = account;
+        $('#walletStatus').html(`Đã kết nối: <strong style="color:#00d4aa;">${account.slice(0, 6)}...${account.slice(-4)}</strong>`);
+
+        // Đổi nút thành màu đỏ (Hủy kết nối)
+        $('#connectWalletBtn')
+          .text('Hủy kết nối (Đổi ví)')
+          .prop('disabled', false)
+          .css({
+            background: 'transparent',
+            color: '#ff4757',
+            border: '2px solid #ff4757'
+          });
+
+        $('#confirmPayment').prop('disabled', false).text('Thanh toán ví Metamask');
+      } else {
+        // Trạng thái: CHƯA KẾT NỐI / ĐÃ HỦY
+        currentAccount = "";
+        $('#walletStatus').text('Chưa kết nối ví Metamask');
+
+        // Đổi nút về màu xanh (Kết nối)
+        $('#connectWalletBtn')
+          .text('Kết nối ví Metamask')
+          .prop('disabled', false)
+          .css({
+            background: 'transparent',
+            color: '#00d4aa',
+            border: '2px solid #00d4aa'
+          });
+
+        $('#confirmPayment').prop('disabled', true).text('Vui lòng kết nối ví');
+      }
+    }
+
+    // --- HÀM KẾT NỐI / HỦY KẾT NỐI ---
+    async function handleWalletAction() {
+      if (!window.ethereum) return alert('Vui lòng cài đặt MetaMask!');
+
+      // 1. Nếu đang kết nối -> Thực hiện HỦY KẾT NỐI
+      if (currentAccount) {
+        updateWalletUI(null); // Reset giao diện về null
+        return;
+      }
+
+      // 2. Nếu chưa kết nối -> Thực hiện KẾT NỐI
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        if (accounts.length > 0) {
+          updateWalletUI(accounts[0]);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Kết nối bị từ chối hoặc lỗi.");
+      }
+    }
+
+    // --- SỰ KIỆN TỰ ĐỘNG ---
+    window.addEventListener('load', async () => {
+      updateTotal();
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.listAccounts(); // Kiểm tra xem đã connect từ trước chưa
+
+        if (accounts.length > 0) {
+          updateWalletUI(accounts[0].address);
+        }
+
+        // Lắng nghe sự kiện: Người dùng đổi ví trong MetaMask
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length > 0) {
+            updateWalletUI(accounts[0]);
+          } else {
+            updateWalletUI(null); // Người dùng disconnect hẳn trong MetaMask
+          }
+        });
+      }
+    });
+
+    // Gán sự kiện click cho nút
+    $('#connectWalletBtn').click(handleWalletAction);
+    // Bước 1: Bấm nút thanh toán -> Tạo đơn hàng trên Database trước
+    $('#confirmPayment').click(async function () {
+      if (!currentAccount) return alert('Vui lòng kết nối ví trước!');
+
+      const btn = $(this);
+      btn.text('Đang khởi tạo đơn hàng...').prop('disabled', true);
+
+      const totalVND = price * multiplier * qty;
+
+      // Gọi API tạo đơn hàng (Pending) để lấy OrderID
+      $.post('/create-pending-order', {
+        eventId: '<%= event._id %>',
+        userId: '<%= user._id %>',
+        ticketType: type,
+        quantity: qty,
+        totalAmount: totalVND
+      }).done(async (res) => {
+        if (res.success) {
+          // Có OrderID rồi thì mới gọi Smart Contract
+          console.log('Đơn hàng tạo thành công, OrderID:', res.orderId);
+          await buyTicket(res.orderId, btn);
+        } else {
+          alert('Lỗi tạo đơn hàng: ' + res.message);
+          btn.text('Thanh toán ví Metamask').prop('disabled', false);
+        }
+      }).fail((err) => {
+        alert('Lỗi kết nối Server');
+        btn.text('Thanh toán ví Metamask').prop('disabled', false);
+      });
+    });
+
+    // Bước 2: Gọi Smart Contract (Tách ra hàm riêng cho gọn)
+    async function buyTicket(orderId, btnElement) {
+      const statusDiv = document.getElementById("walletStatus");
+
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        // A. Xin chữ ký từ Backend
+        statusDiv.innerText = "Đang xin chữ ký bảo mật...";
+
+        // Lưu ý: URL này phải đúng với route backend Nodejs của bạn
+        const response = await fetch('/api/get-signature', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderId, userAddress: currentAccount })
+        });
+
+        const data = await response.json();
+        if (!data.signature) throw new Error("Server không cấp chữ ký!");
+
+        // B. Gọi Smart Contract và KIỂM TRA SỐ DƯ (Bản nâng cấp)
+        statusDiv.innerText = "Đang kiểm tra số dư và ước tính phí...";
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        const priceInWei = ethers.toBigInt(data.price);
+
+        try {
+          // Ước tính gas cần cho giao dịch
+          const estimatedGas = await contract.buyTicket.estimateGas(
+            data.orderId,
+            priceInWei,
+            data.signature,
+            { value: priceInWei }
+          );
+
+          // Lấy giá gas hiện tại
+          const feeData = await provider.getFeeData();
+          const gasPrice = feeData.gasPrice;
+
+          // Tính tổng phí gas ước tính
+          const estimatedGasFee = estimatedGas * gasPrice;
+          const totalRequired = priceInWei + estimatedGasFee;
+          const balance = await provider.getBalance(signer.getAddress());
+
+          if (balance < totalRequired) {
+            const format = (val) => ethers.formatEther(val).slice(0, 10);
+            const msg = `Số dư không đủ.
+                        - Số dư của bạn: ${format(balance)} CFX/ETH
+                        - Tổng yêu cầu: ~${format(totalRequired)} CFX/ETH
+                        (Bao gồm ${format(priceInWei)} cho vé và ~${format(estimatedGasFee)} cho phí giao dịch)
+                        `;
+            alert(msg);
+            btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+            statusDiv.innerText = "Lỗi: Số dư không đủ.";
+            return;
+          }
+
+        } catch (gasError) {
+          // Bắt cả lỗi nếu việc ước tính gas thất bại (thường do logic hợp đồng)
+          console.error("Lỗi khi ước tính gas:", gasError);
+          alert("Không thể ước tính phí giao dịch. Lỗi có thể từ logic smart contract. Chi tiết: " + (gasError.reason || gasError.message));
+          btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+          return;
+        }
+
+
+        // Nếu đủ tiền, tiến hành giao dịch
+        statusDiv.innerText = "Đang mở MetaMask...";
+        const tx = await contract.buyTicket(
+          data.orderId,
+          priceInWei,
+          data.signature,
+          { value: priceInWei }
+        );
+        statusDiv.innerText = "Đang chờ xác nhận trên Blockchain...";
+        btnElement.text('Đang xử lý giao dịch...');
+
+        // Chờ giao dịch hoàn tất
+        await tx.wait();
+
+        // C. Thành công
+        statusDiv.innerText = "✅ Mua thành công!";
+        alert("Giao dịch thành công! Hash: " + tx.hash);
+
+        // Cập nhật lại trạng thái đơn hàng trên Database (Thành Success)
+        $.post('/update-order-success', { orderId: orderId, txHash: tx.hash, fromAddress: currentAccount, toAddress: CONTRACT_ADDRESS, network: "conflux testnet", status: "Success", amount: Number(ethers.formatEther(priceInWei)) })
+          .done((res) => {
+            if (res.success) {
+              console.log('Cập nhật đơn hàng thành công trên Database.');
+            } else {
+              console.warn('Lỗi cập nhật đơn hàng trên Database:', res.message);
+            }
+          }).fail((err) => {
+            console.error('Lỗi kết nối Server khi cập nhật đơn hàng:', err);
+          });
+
+        // Chuyển hướng
+        window.location.href = '/my-tickets';
+
+      } catch (error) {
+        console.error(error);
+        alert("Giao dịch thất bại: " + (error.reason || error));
+        btnElement.text('Thanh toán ví Metamask').prop('disabled', false);
+      }
+    }
+  </script>
+</body>
+
+</html>

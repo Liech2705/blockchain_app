@@ -1,0 +1,168 @@
+<%- include('../layout.ejs') %>
+
+<style>
+    :root {
+        --primary-color: #00d4aa;
+        --background-color: #121212;
+        --card-color: #1e1e1e;
+        --text-color: #ffffff;
+        --input-bg-color: #2a2a2a;
+        --border-color: #3a3a3a;
+    }
+
+    .admin-container {
+        padding: 40px;
+        background-color: var(--background-color);
+        min-height: 100vh;
+    }
+
+    .admin-header {
+        margin-bottom: 30px;
+    }
+
+    .admin-header h2 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .admin-card {
+        background-color: var(--card-color);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--border-color);
+        max-width: 800px;
+        margin: auto;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        color: #a0a0a0;
+        margin-bottom: 8px;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        background-color: var(--input-bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 14px;
+        color: var(--text-color);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.1);
+    }
+    
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 30px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+    }
+
+
+    .form-actions {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .submit-btn {
+        background: var(--primary-color);
+        color: #121212;
+        font-weight: 600;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background: #00b894;
+        transform: translateY(-2px);
+    }
+    
+    .cancel-btn {
+        background: #424242;
+        color: var(--text-color);
+        font-weight: 500;
+        padding: 14px 30px;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .cancel-btn:hover {
+        background: #525252;
+    }
+
+</style>
+
+<div class="admin-container">
+    <div class="admin-card">
+        <div class="admin-header">
+            <h2>Thêm tài khoản mới</h2>
+        </div>
+        <form action="/admin/users/add" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="HoTen">Họ Tên</label>
+                    <input type="text" id="HoTen" name="HoTen" required>
+                </div>
+                <div class="form-group">
+                    <label for="Email">Email</label>
+                    <input type="email" id="Email" name="Email" required>
+                </div>
+                <div class="form-group">
+                    <label for="SoDT">Số ĐT</label>
+                    <input type="text" id="SoDT" name="SoDT" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Thêm</button>
+                <a href="/admin/users" class="cancel-btn">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
